@@ -893,7 +893,8 @@ module.exports = {
 function run(g) {
   var root = util.addDummyNode(g, "root", {}, "_root"),
       depths = treeDepths(g),
-      height = _.max(depths) - 1,
+      maxDepth = _.max(_.values(depths)),
+      height = (_.isUndefined(maxDepth) ? Number.NEGATIVE_INFINITY : maxDepth) - 1,
       nodeSep = 2 * height + 1;
 
   g.graph().nestingRoot = root;
@@ -2067,9 +2068,9 @@ function buildBlockGraph(g, layering, root, reverseSep) {
  * Returns the alignment that has the smallest width of the given alignments.
  */
 function findSmallestWidthAlignment(g, xss) {
-  return _.min(xss, function(xs) {
-    var min = _.min(xs, function(x, v) { return x - width(g, v) / 2; }),
-        max = _.max(xs, function(x, v) { return x + width(g, v) / 2; });
+  return _.minBy(_.values(xss), function(xs) {
+    var min = _.min(_.map(xs, function(x, v) { return x - width(g, v) / 2; })),
+        max = _.max(_.map(xs, function(x, v) { return x + width(g, v) / 2; }));
     return max - min;
   });
 }
@@ -2082,8 +2083,11 @@ function findSmallestWidthAlignment(g, xss) {
  * coordinate of the smallest width alignment.
  */
 function alignCoordinates(xss, alignTo) {
-  var alignToMin = _.min(alignTo),
-      alignToMax = _.max(alignTo);
+  var alignToMin = _.min(_.values(alignTo)),
+      alignToMax = _.max(_.values(alignTo));
+
+  alignToMin = _.isUndefined(alignToMin) ? Number.POSITIVE_INFINITY : alignToMin;
+  alignToMax = _.isUndefined(alignToMax) ? Number.NEGATIVE_INFINITY : alignToMax;
 
   _.each(["u", "d"], function(vert) {
     _.each(["l", "r"], function(horiz) {
@@ -2092,7 +2096,9 @@ function alignCoordinates(xss, alignTo) {
           delta;
       if (xs === alignTo) return;
 
-      delta = horiz === "l" ? alignToMin - _.min(xs) : alignToMax - _.max(xs);
+      delta = horiz === "l"
+          ? alignToMin - _.min(_.values(xs))
+          : alignToMax - _.max(_.values(xs));
 
       if (delta) {
         xss[alignment] = _.mapValues(xs, function(x) { return x + delta; });
@@ -2106,7 +2112,7 @@ function balance(xss, align) {
     if (align) {
       return xss[align.toLowerCase()][v];
     } else {
-      var xs = _.sortBy(_.pluck(xss, v));
+      var xs = _.sortBy(_.map(xss, v));
       return (xs[1] + xs[2]) / 2;
     }
   });
@@ -2297,7 +2303,7 @@ function tightTree(t, g) {
  * it.
  */
 function findMinSlackEdge(t, g) {
-  return _.min(g.edges(), function(e) {
+  return _.minBy(g.edges(), function(e) {
     if (t.hasNode(e.v) !== t.hasNode(e.w)) {
       return slack(g, e);
     }
@@ -2550,7 +2556,7 @@ function enterEdge(t, g, edge) {
            flip !== isDescendant(t, t.node(edge.w), tailLabel);
   });
 
-  return _.min(candidates, function(edge) { return slack(g, edge); });
+  return _.minBy(candidates, function(edge) { return slack(g, edge); });
 }
 
 function exchangeEdges(t, g, e, f) {
@@ -2641,7 +2647,7 @@ function longestPath(g) {
       return dfs(e.w) - g.edge(e).minlen;
     }));
 
-    if (rank === Number.POSITIVE_INFINITY) {
+    if (_.isUndefined(rank) || rank === Number.POSITIVE_INFINITY) {
       rank = 0;
     }
 
@@ -2898,7 +2904,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.7.4";
+module.exports = "0.7.5";
 
 },{}]},{},[1])(1)
 });

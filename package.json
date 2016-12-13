@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.7.5-pre",
+  "version": "0.7.5",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "main": "index.js",
@@ -9,8 +9,8 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^1.0.5",
-    "lodash": "^3.10.0"
+    "graphlib": "^2.1.1",
+    "lodash": "^4.13.1"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
@@ -34,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cpettitt/dagre.git"
+    "url": "https://github.com/rouzwawi/dagre.git"
   },
   "license": "MIT"
 }
